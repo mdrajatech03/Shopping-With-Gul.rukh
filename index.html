@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="headTitle">Gul.rukh - Exclusive Luxury Collection</title>
+    <title id="headTitle">gul.rukh - Exclusive Luxury Collection</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -68,8 +68,8 @@
 
     <!-- Top Announcement Bar -->
     <div class="bg-[#5A224A] text-white text-xs py-2 px-6 text-center tracking-wide font-medium flex justify-between items-center">
-        <span id="announcementBanner" class="hidden md:inline"><i class="fa-solid fa-sparkles text-[#FDBB5B] mr-2"></i>Gul.rukh Luxury Store - Premium Products delivered to your doorstep</span>
-        <span class="w-full md:w-auto text-center"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1 text-sm"></i> Direct Helpline: <strong>+91 <span id="headerWhatsApp">9006439707</span></strong></span>
+        <span id="announcementBanner" class="hidden md:inline"><i class="fa-solid fa-sparkles text-[#FDBB5B] mr-2"></i>gul.rukh Luxury Store - Premium Products delivered to your doorstep</span>
+        <span class="w-full md:w-auto text-center"><i class="fa-brands fa-whatsapp text-white mr-1 text-sm"></i> Direct Helpline: <strong class="text-white">+91 <span id="headerWhatsApp">9006439707</span></strong></span>
         <span class="hidden md:inline text-xs opacity-80">100% Guaranteed Quality</span>
     </div>
 
@@ -78,14 +78,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 
-                <!-- Brand Logo & Name -->
+                <!-- Brand Logo & Name (Small g) -->
                 <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('store')">
                     <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#5A224A] to-[#FDBB5B] flex items-center justify-center shadow-lg border border-white/30 flex-shrink-0">
-                        <span id="brandLogoChar" class="font-glacial text-xl sm:text-2xl font-bold text-white">G</span>
+                        <span id="brandLogoChar" class="font-glacial text-xl sm:text-2xl font-bold text-white">g</span>
                     </div>
                     <div>
                         <h1 id="brandNameDisplay" class="font-glacial text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
-                            Gul<span class="text-[#FDBB5B]">.rukh</span>
+                            gul<span class="text-[#FDBB5B]">.rukh</span>
                         </h1>
                         <p id="brandTaglineDisplay" class="text-[10px] tracking-widest uppercase text-purple-200 -mt-1 font-light">Elegance Redefined</p>
                     </div>
@@ -299,12 +299,12 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 rounded-full bg-[#FDBB5B] flex items-center justify-center">
-                        <span id="footerLogoChar" class="font-glacial text-base font-bold text-slate-900">G</span>
+                        <span id="footerLogoChar" class="font-glacial text-base font-bold text-slate-900">g</span>
                     </div>
-                    <span id="footerBrandName" class="font-glacial text-lg font-bold text-white">Gul.rukh</span>
+                    <span id="footerBrandName" class="font-glacial text-lg font-bold text-white">gul.rukh</span>
                 </div>
                 <div class="text-purple-100">
-                    Direct Orders Helpline: <strong class="text-emerald-400">+91 <span id="footerWhatsApp">9006439707</span></strong>
+                    Direct Orders Helpline: <strong class="text-white">+91 <span id="footerWhatsApp">9006439707</span></strong>
                 </div>
                 <div class="text-purple-200/80 text-[11px]">
                     &copy; 2026 Store Admin System. Light Lavender (#C7C0E8), Deep Plum (#5A224A) & Warm Amber (#FDBB5B) Theme.
@@ -323,8 +323,8 @@
             <form onsubmit="verifyAdminPassword(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Enter Admin Password</label>
-                    <input type="password" id="adminLoginInput" required placeholder="Default: xyz9009" class="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
-                    <span class="text-[10px] text-slate-400 mt-1 block">Default password is <strong>xyz9009</strong></span>
+                    <!-- Updated Placeholder to 'enter password' -->
+                    <input type="password" id="adminLoginInput" required placeholder="enter password" class="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" onclick="closeAdminAuthModal()" class="px-4 py-2 text-xs text-slate-500 font-semibold">Cancel</button>
@@ -586,12 +586,12 @@
 
         const defaultCategories = ["Ethnic Wear", "Handbags", "Perfumes", "Jewelry", "Home Decor"];
 
-        // Updated Default Password to xyz9009
+        // Lowercase brand name 'gul.rukh'
         const defaultSettings = {
-            storeName: "Gul.rukh",
+            storeName: "gul.rukh",
             tagline: "Elegance Redefined",
             whatsapp: "9006439707",
-            bannerText: "Gul.rukh Luxury Store - Premium Products delivered to your doorstep",
+            bannerText: "gul.rukh Luxury Store - Premium Products delivered to your doorstep",
             adminPassword: "xyz9009"
         };
 
@@ -599,12 +599,6 @@
         let categories = JSON.parse(localStorage.getItem('gulrukh_admin_categories')) || defaultCategories;
         let siteSettings = JSON.parse(localStorage.getItem('gulrukh_site_settings')) || defaultSettings;
         
-        // Ensure default password updates if previously saved as default 'admin'
-        if (siteSettings.adminPassword === "admin") {
-            siteSettings.adminPassword = "xyz9009";
-            localStorage.setItem('gulrukh_site_settings', JSON.stringify(siteSettings));
-        }
-
         let selectedProductForBooking = null;
         let isAdminLoggedIn = false;
 
@@ -804,8 +798,8 @@
 
         function applySiteSettings() {
             document.getElementById('headTitle').textContent = `${siteSettings.storeName} - Exclusive Luxury Store`;
-            document.getElementById('brandLogoChar').textContent = siteSettings.storeName.charAt(0);
-            document.getElementById('footerLogoChar').textContent = siteSettings.storeName.charAt(0);
+            document.getElementById('brandLogoChar').textContent = siteSettings.storeName.charAt(0).toLowerCase();
+            document.getElementById('footerLogoChar').textContent = siteSettings.storeName.charAt(0).toLowerCase();
             
             const nameParts = siteSettings.storeName.split('.');
             if(nameParts.length > 1) {
@@ -860,7 +854,7 @@
                 <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-purple-200 flex flex-col group">
                     <div class="relative overflow-hidden aspect-square bg-slate-100 cursor-pointer" onclick="openProductDetail('${product.id}')">
                         <img src="${product.image}" alt="${product.title}" 
-                             onerror="this.src='https://placehold.co/600x600/5A224A/FFFFFF?text=Gul.rukh'"
+                             onerror="this.src='https://placehold.co/600x600/5A224A/FFFFFF?text=gul.rukh'"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <span class="absolute top-3 left-3 bg-[#5A224A] text-white text-[10px] uppercase font-bold px-2.5 py-1 rounded-full shadow">
                             ${product.category}
@@ -994,7 +988,7 @@
                 stock: document.getElementById('prodStock').value,
                 originalPrice: parseFloat(document.getElementById('prodOriginalPrice').value),
                 price: parseFloat(document.getElementById('prodPrice').value),
-                image: document.getElementById('prodImage').value.trim() || 'https://placehold.co/600x600/5A224A/FFFFFF?text=Gul.rukh',
+                image: document.getElementById('prodImage').value.trim() || 'https://placehold.co/600x600/5A224A/FFFFFF?text=gul.rukh',
                 description: document.getElementById('prodDescription').value.trim()
             };
 
