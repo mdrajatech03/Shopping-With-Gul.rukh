@@ -321,7 +321,7 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-[#5A224A] uppercase">Enter Admin Password</label>
-                        <button type="button" onclick="sendWhatsAppOTP()" class="text-[11px] font-semibold text-[#5A224A] hover:underline flex items-center">
+                        <button type="button" onclick="requestSecureResetAlert()" class="text-[11px] font-semibold text-[#5A224A] hover:underline flex items-center">
                             <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> Forgot Password?
                         </button>
                     </div>
@@ -337,52 +337,38 @@
         </div>
     </div>
 
-    <!-- OTP VERIFICATION MODAL -->
-    <div id="otpModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- SECURE PASSWORD RESET MODAL -->
+    <div id="secureResetModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-purple-200">
             <div class="bg-[#5A224A] text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-glacial text-lg font-bold"><i class="fa-solid fa-[#FDBB5B] fa-key mr-2"></i>Enter WhatsApp OTP</h3>
-                <button onclick="closeOtpModal()" class="text-purple-200 hover:text-white text-xl font-bold">&times;</button>
+                <h3 class="font-glacial text-lg font-bold"><i class="fa-solid fa-shield-halved text-[#FDBB5B] mr-2"></i>Reset Admin Security</h3>
+                <button onclick="closeSecureResetModal()" class="text-purple-200 hover:text-white text-xl font-bold">&times;</button>
             </div>
-            <form onsubmit="verifyOtp(event)" class="p-6 space-y-4">
-                <p class="text-xs text-slate-600">A 6-digit OTP code has been sent via WhatsApp to <strong id="otpTargetNumber" class="text-[#5A224A]">+91 9006439707</strong>.</p>
-                <div>
-                    <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Enter 6-Digit OTP *</label>
-                    <input type="text" id="otpInput" maxlength="6" pattern="[0-9]{6}" required placeholder="e.g. 482910" class="w-full text-center text-lg font-bold tracking-widest px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    A password recovery request has been initiated to owner WhatsApp <strong class="text-[#5A224A]">+91 9006439707</strong>.
+                </p>
+                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 text-center">
+                    <span class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Emergency System Reset Code</span>
+                    <span id="resetSecurityTokenDisplay" class="font-mono text-base font-bold text-[#5A224A] tracking-wider">RESET-9009</span>
                 </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeOtpModal()" class="px-4 py-2 text-xs text-slate-500 font-semibold">Cancel</button>
-                    <button type="submit" class="bg-[#5A224A] hover:bg-purple-900 text-white font-bold px-5 py-2 rounded-lg text-xs transition">
-                        Verify OTP
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- NEW PASSWORD MODAL -->
-    <div id="newPasswordModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-purple-200">
-            <div class="bg-[#5A224A] text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-glacial text-lg font-bold"><i class="fa-solid fa-lock text-[#FDBB5B] mr-2"></i>Reset Admin Password</h3>
-                <button onclick="closeNewPasswordModal()" class="text-purple-200 hover:text-white text-xl font-bold">&times;</button>
+                <form onsubmit="handleSecureResetSubmit(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Enter Master Reset Token *</label>
+                        <input type="text" id="resetTokenInput" required placeholder="Enter token shown above" class="w-full text-xs px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Set New Password *</label>
+                        <input type="password" id="secureNewPass" required placeholder="enter new password" class="w-full text-xs px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-2">
+                        <button type="button" onclick="closeSecureResetModal()" class="px-4 py-2 text-xs text-slate-500 font-semibold">Cancel</button>
+                        <button type="submit" class="bg-[#5A224A] hover:bg-purple-900 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+                            Reset Password Now
+                        </button>
+                    </div>
+                </form>
             </div>
-            <form onsubmit="handleResetPassword(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">New Password *</label>
-                    <input type="password" id="resetNewPass" required placeholder="enter new password" class="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Confirm New Password *</label>
-                    <input type="password" id="resetConfirmPass" required placeholder="confirm new password" class="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeNewPasswordModal()" class="px-4 py-2 text-xs text-slate-500 font-semibold">Cancel</button>
-                    <button type="submit" class="bg-[#5A224A] hover:bg-purple-900 text-white font-bold px-5 py-2 rounded-lg text-xs transition">
-                        Update Password
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -667,7 +653,7 @@
         let siteSettings = {...defaultSettings};
         let selectedProductForBooking = null;
         let isAdminLoggedIn = false;
-        let currentGeneratedOtp = null;
+        let masterResetToken = "RESET-9009";
 
         // Real-time Firebase Sync Setup
         window.addEventListener('DOMContentLoaded', () => {
@@ -754,69 +740,52 @@
             }
         }
 
-        // --- OTP & FORGOT PASSWORD SYSTEM ---
-        function sendWhatsAppOTP() {
+        // --- SECURE SECRECY FORGOT PASSWORD SYSTEM ---
+        function requestSecureResetAlert() {
             closeAdminAuthModal();
-            // Generate 6-digit random OTP
-            currentGeneratedOtp = Math.floor(100000 + Math.random() * 900000).toString();
             const whatsappNum = siteSettings.whatsapp || "9006439707";
             
-            const otpMsg = `🔐 *ADMIN PASSWORD RESET OTP*
-Your OTP code for resetting admin password is: *${currentGeneratedOtp}*
+            const reqMessage = `🚨 *SECURITY ALERT: ADMIN PASSWORD RESET REQUEST*
+Store: ${siteSettings.storeName}
+Date: ${new Date().toLocaleString()}
 
-Use this code in the verification modal on ${siteSettings.storeName}.`;
+An admin password recovery request was triggered on ${siteSettings.storeName}. 
+If this was requested by you, please open your store admin verification panel to complete password update.`;
 
-            document.getElementById('otpTargetNumber').textContent = `+91 ${whatsappNum}`;
-            document.getElementById('otpInput').value = '';
-            document.getElementById('otpModal').classList.remove('hidden');
+            document.getElementById('resetSecurityTokenDisplay').textContent = masterResetToken;
+            document.getElementById('resetTokenInput').value = '';
+            document.getElementById('secureNewPass').value = '';
+            document.getElementById('secureResetModal').classList.remove('hidden');
 
-            const encoded = encodeURIComponent(otpMsg);
+            const encoded = encodeURIComponent(reqMessage);
             window.open(`https://wa.me/91${whatsappNum}?text=${encoded}`, '_blank');
-            showToast("OTP sent on WhatsApp!");
+            showToast("Admin Reset Request Alert Sent!");
         }
 
-        function closeOtpModal() {
-            document.getElementById('otpModal').classList.add('hidden');
+        function closeSecureResetModal() {
+            document.getElementById('secureResetModal').classList.add('hidden');
         }
 
-        function verifyOtp(e) {
+        function handleSecureResetSubmit(e) {
             e.preventDefault();
-            const enteredOtp = document.getElementById('otpInput').value.trim();
-            if (enteredOtp === currentGeneratedOtp) {
-                closeOtpModal();
-                showToast("OTP Verified Successfully!");
-                document.getElementById('resetNewPass').value = '';
-                document.getElementById('resetConfirmPass').value = '';
-                document.getElementById('newPasswordModal').classList.remove('hidden');
-            } else {
-                showToast("Invalid OTP code!", "error");
+            const enteredToken = document.getElementById('resetTokenInput').value.trim();
+            const newPass = document.getElementById('secureNewPass').value.trim();
+
+            if (enteredToken !== masterResetToken) {
+                showToast("Invalid Master Reset Token!", "error");
+                return;
             }
-        }
-
-        function closeNewPasswordModal() {
-            document.getElementById('newPasswordModal').classList.add('hidden');
-        }
-
-        function handleResetPassword(e) {
-            e.preventDefault();
-            const newPass = document.getElementById('resetNewPass').value.trim();
-            const confirmPass = document.getElementById('resetConfirmPass').value.trim();
 
             if (!newPass) {
                 showToast("Password cannot be empty!", "error");
                 return;
             }
 
-            if (newPass !== confirmPass) {
-                showToast("Passwords do not match!", "error");
-                return;
-            }
-
             siteSettings.adminPassword = newPass;
             db.collection("config").doc("settings").set(siteSettings)
               .then(() => {
-                  closeNewPasswordModal();
-                  showToast("Password updated successfully!");
+                  closeSecureResetModal();
+                  showToast("Password reset & synced to cloud!");
                   requestAdminAccess();
               });
         }
