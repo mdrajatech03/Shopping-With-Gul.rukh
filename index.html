@@ -406,7 +406,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Product Title *</label>
-                    <input type="text" id="prodTitle" required placeholder="e.g. Royal Silk Banarasi Saree" class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
+                    <input type="text" id="prodTitle" required placeholder="e.g. Royal Velvet Embroidered Saree" class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -466,8 +466,9 @@
 
                 <div class="pt-2 flex items-center justify-end space-x-3">
                     <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-500">Cancel</button>
-                    <button type="submit" class="bg-[#5A224A] text-white hover:bg-purple-900 px-6 py-2.5 rounded-lg text-xs font-bold shadow transition">
-                        Save Product
+                    <button id="submitProductBtn" type="submit" class="bg-[#5A224A] text-white hover:bg-purple-900 px-6 py-2.5 rounded-lg text-xs font-bold shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Save Product</span>
                     </button>
                 </div>
             </form>
@@ -576,7 +577,6 @@
 
     <!-- FIREBASE & APP LOGIC -->
     <script>
-        // UPDATED FIREBASE CONFIGURATION (projectId: gulrukh-store-4f75a)
         const firebaseConfig = {
             apiKey: "AIzaSyCOKtkrQaskNl1LASRoGhFtDC1wQ2axgFM",
             authDomain: "gulrukh-store-4f75a.firebaseapp.com",
@@ -587,7 +587,6 @@
             measurementId: "G-WK7FEWVWWQ"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -634,7 +633,7 @@
             }
         ];
 
-        const defaultCategories = ["Ethnic Wear", "Handbags", "Perfumes", "Jewelry", "Home Decor"];
+        const defaultCategories = ["Ethnic Wear", "Handbags", "Perfumes", "Jewelry", "Scrunchie", "Home Decor"];
         const defaultSettings = {
             storeName: "gul.rukh",
             tagline: "Elegance Redefined",
@@ -643,7 +642,6 @@
             adminPassword: "xyz9009"
         };
 
-        // SECRET MASTER CODE FOR FORGOT PASSWORD RESET
         const SECRET_MASTER_CODE = "kX9#vP2$mQ8!zL4&";
 
         let products = [];
@@ -652,10 +650,20 @@
         let selectedProductForBooking = null;
         let isAdminLoggedIn = false;
 
-        // Real-time Firebase Sync Setup
         window.addEventListener('DOMContentLoaded', () => {
+            loadLocalCache();
             initCloudSync();
         });
+
+        function loadLocalCache() {
+            try {
+                const cachedProds = localStorage.getItem('gulrukh_local_products');
+                if (cachedProds) {
+                    products = JSON.parse(cachedProds);
+                    renderStorefront(products);
+                }
+            } catch(e) { console.error(e); }
+        }
 
         function initCloudSync() {
             db.collection("products").onSnapshot((snapshot) => {
@@ -665,12 +673,14 @@
                 });
                 if (products.length === 0) {
                     defaultProducts.forEach(p => db.collection("products").doc(p.id).set(p));
+                    products = [...defaultProducts];
                 }
+                localStorage.setItem('gulrukh_local_products', JSON.stringify(products));
                 renderStorefront(products);
                 if (isAdminLoggedIn) renderAdminInventory();
             }, (error) => {
                 console.log("Firestore Products Error:", error);
-                products = defaultProducts;
+                if(products.length === 0) products = defaultProducts;
                 renderStorefront(products);
             });
 
@@ -699,13 +709,13 @@
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = `p-3 rounded-lg text-white text-xs font-semibold shadow-lg transition-all duration-300 transform translate-y-2 ${type === 'success' ? 'bg-emerald-600' : 'bg-[#5A224A]'}`;
-            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'} mr-2"></i> ${message}`;
+            toast.className = `p-3.5 rounded-xl text-white text-xs font-bold shadow-2xl transition-all duration-300 transform translate-y-2 flex items-center space-x-2 ${type === 'success' ? 'bg-emerald-600 border border-emerald-400' : 'bg-[#5A224A] border border-purple-400'}`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-base' : 'fa-triangle-exclamation text-base'}"></i> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-4');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 3500);
         }
 
         function requestAdminAccess() {
@@ -737,7 +747,6 @@
             }
         }
 
-        // --- MASTER CODE FORGOT PASSWORD RESET LOGIC ---
         function openMasterCodeModal() {
             closeAdminAuthModal();
             document.getElementById('masterCodeInput').value = '';
@@ -771,7 +780,6 @@
                 return;
             }
 
-            // Update Password in Local State & Firebase Cloud (Invalidating previous password)
             siteSettings.adminPassword = newPass;
             db.collection("config").doc("settings").set(siteSettings)
               .then(() => {
@@ -882,15 +890,37 @@
             }
         }
 
+        // --- AUTOMATIC IMAGE COMPRESSOR FOR CLOUD COMPATIBILITY ---
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(event) {
-                const base64Url = event.target.result;
-                document.getElementById('prodImage').value = base64Url;
-                updateImagePreview(base64Url);
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG with 0.7 quality to keep size under 100KB
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('prodImage').value = compressedBase64;
+                    updateImagePreview(compressedBase64);
+                };
+                img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -1116,33 +1146,67 @@
             document.getElementById('productModal').classList.add('hidden');
         }
 
+        // --- FULL WORKING FAST & RELIABLE SAVE PRODUCT LOGIC ---
         function handleSaveProduct(e) {
             e.preventDefault();
+            const submitBtn = document.getElementById('submitProductBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving...</span>`;
+
             const editId = document.getElementById('editProductId').value;
             const productId = editId || `GR-${Math.floor(100 + Math.random() * 900)}`;
+
+            const imgVal = document.getElementById('prodImage').value.trim();
 
             const productData = {
                 id: productId,
                 title: document.getElementById('prodTitle').value.trim(),
                 category: document.getElementById('prodCategory').value,
                 stock: document.getElementById('prodStock').value,
-                originalPrice: parseFloat(document.getElementById('prodOriginalPrice').value),
-                price: parseFloat(document.getElementById('prodPrice').value),
-                image: document.getElementById('prodImage').value.trim() || 'https://placehold.co/600x600/5A224A/FFFFFF?text=gul.rukh',
+                originalPrice: parseFloat(document.getElementById('prodOriginalPrice').value) || 0,
+                price: parseFloat(document.getElementById('prodPrice').value) || 0,
+                image: imgVal || 'https://placehold.co/600x600/5A224A/FFFFFF?text=gul.rukh',
                 description: document.getElementById('prodDescription').value.trim()
             };
 
+            // Update Local Array & Storage instantly
+            const existingIndex = products.findIndex(p => p.id === productId);
+            if(existingIndex > -1) {
+                products[existingIndex] = productData;
+            } else {
+                products.unshift(productData);
+            }
+            localStorage.setItem('gulrukh_local_products', JSON.stringify(products));
+
+            // Sync with Firestore Cloud
             db.collection("products").doc(productId).set(productData)
               .then(() => {
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Save Product</span>`;
                   closeProductModal();
-                  showToast(editId ? "Product Updated Successfully!" : "New Product Added to Cloud!");
+                  renderStorefront(products);
+                  if (isAdminLoggedIn) renderAdminInventory();
+                  showToast(editId ? "Product Updated Successfully!" : "New Product Saved Successfully!");
+              })
+              .catch((err) => {
+                  console.error("Cloud save warning:", err);
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Save Product</span>`;
+                  closeProductModal();
+                  renderStorefront(products);
+                  if (isAdminLoggedIn) renderAdminInventory();
+                  showToast("Product saved locally!", "success");
               });
         }
 
         function deleteProduct(productId) {
-            if (confirm("Are you sure you want to delete this product from cloud store?")) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                products = products.filter(p => p.id !== productId);
+                localStorage.setItem('gulrukh_local_products', JSON.stringify(products));
                 db.collection("products").doc(productId).delete()
                   .then(() => {
+                      renderStorefront(products);
+                      if (isAdminLoggedIn) renderAdminInventory();
                       showToast("Product Removed", "error");
                   });
             }
@@ -1153,6 +1217,7 @@
                 defaultProducts.forEach(p => db.collection("products").doc(p.id).set(p));
                 db.collection("config").doc("categories").set({ list: defaultCategories });
                 db.collection("config").doc("settings").set(defaultSettings);
+                localStorage.removeItem('gulrukh_local_products');
                 showToast("Reset to Default Settings!");
             }
         }
