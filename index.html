@@ -321,8 +321,8 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-[#5A224A] uppercase">Enter Admin Password</label>
-                        <button type="button" onclick="requestSecureResetAlert()" class="text-[11px] font-semibold text-[#5A224A] hover:underline flex items-center">
-                            <i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> Forgot Password?
+                        <button type="button" onclick="openMasterCodeModal()" class="text-[11px] font-semibold text-[#5A224A] hover:underline flex items-center">
+                            <i class="fa-solid fa-key text-amber-600 mr-1"></i> Forgot Password?
                         </button>
                     </div>
                     <input type="password" id="adminLoginInput" required placeholder="enter password" class="w-full text-sm px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
@@ -337,38 +337,33 @@
         </div>
     </div>
 
-    <!-- SECURE PASSWORD RESET MODAL -->
-    <div id="secureResetModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- MASTER CODE FORGOT PASSWORD POPUP MODAL -->
+    <div id="masterCodeModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-purple-200">
             <div class="bg-[#5A224A] text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-glacial text-lg font-bold"><i class="fa-solid fa-shield-halved text-[#FDBB5B] mr-2"></i>Reset Admin Security</h3>
-                <button onclick="closeSecureResetModal()" class="text-purple-200 hover:text-white text-xl font-bold">&times;</button>
+                <h3 class="font-glacial text-lg font-bold"><i class="fa-solid fa-shield-halved text-[#FDBB5B] mr-2"></i>Reset Admin Password</h3>
+                <button onclick="closeMasterCodeModal()" class="text-purple-200 hover:text-white text-xl font-bold">&times;</button>
             </div>
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    A password recovery request has been initiated to owner WhatsApp <strong class="text-[#5A224A]">+91 9006439707</strong>.
-                </p>
-                <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 text-center">
-                    <span class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Emergency System Reset Code</span>
-                    <span id="resetSecurityTokenDisplay" class="font-mono text-base font-bold text-[#5A224A] tracking-wider">RESET-9009</span>
+            <form onsubmit="handleMasterResetSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">enter the master code *</label>
+                    <input type="text" id="masterCodeInput" required placeholder="Enter Secret Master Code" class="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
                 </div>
-                <form onsubmit="handleSecureResetSubmit(event)" class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Enter Master Reset Token *</label>
-                        <input type="text" id="resetTokenInput" required placeholder="Enter token shown above" class="w-full text-xs px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Set New Password *</label>
-                        <input type="password" id="secureNewPass" required placeholder="enter new password" class="w-full text-xs px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
-                    </div>
-                    <div class="flex justify-end space-x-2 pt-2">
-                        <button type="button" onclick="closeSecureResetModal()" class="px-4 py-2 text-xs text-slate-500 font-semibold">Cancel</button>
-                        <button type="submit" class="bg-[#5A224A] hover:bg-purple-900 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
-                            Reset Password Now
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">New Password *</label>
+                    <input type="password" id="masterNewPass" required placeholder="enter new password" class="w-full text-xs px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-[#5A224A] uppercase mb-1">Confirm New Password *</label>
+                    <input type="password" id="masterConfirmPass" required placeholder="confirm new password" class="w-full text-xs px-3.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-[#5A224A]">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeMasterCodeModal()" class="px-4 py-2 text-xs text-slate-500 font-semibold">Cancel</button>
+                    <button type="submit" class="bg-[#5A224A] hover:bg-purple-900 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+                        Update Password
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -648,12 +643,14 @@
             adminPassword: "xyz9009"
         };
 
+        // SECRET MASTER CODE FOR FORGOT PASSWORD RESET
+        const SECRET_MASTER_CODE = "kX9#vP2$mQ8!zL4&";
+
         let products = [];
         let categories = [];
         let siteSettings = {...defaultSettings};
         let selectedProductForBooking = null;
         let isAdminLoggedIn = false;
-        let masterResetToken = "RESET-9009";
 
         // Real-time Firebase Sync Setup
         window.addEventListener('DOMContentLoaded', () => {
@@ -740,52 +737,46 @@
             }
         }
 
-        // --- SECURE SECRECY FORGOT PASSWORD SYSTEM ---
-        function requestSecureResetAlert() {
+        // --- MASTER CODE FORGOT PASSWORD RESET LOGIC ---
+        function openMasterCodeModal() {
             closeAdminAuthModal();
-            const whatsappNum = siteSettings.whatsapp || "9006439707";
-            
-            const reqMessage = `🚨 *SECURITY ALERT: ADMIN PASSWORD RESET REQUEST*
-Store: ${siteSettings.storeName}
-Date: ${new Date().toLocaleString()}
-
-An admin password recovery request was triggered on ${siteSettings.storeName}. 
-If this was requested by you, please open your store admin verification panel to complete password update.`;
-
-            document.getElementById('resetSecurityTokenDisplay').textContent = masterResetToken;
-            document.getElementById('resetTokenInput').value = '';
-            document.getElementById('secureNewPass').value = '';
-            document.getElementById('secureResetModal').classList.remove('hidden');
-
-            const encoded = encodeURIComponent(reqMessage);
-            window.open(`https://wa.me/91${whatsappNum}?text=${encoded}`, '_blank');
-            showToast("Admin Reset Request Alert Sent!");
+            document.getElementById('masterCodeInput').value = '';
+            document.getElementById('masterNewPass').value = '';
+            document.getElementById('masterConfirmPass').value = '';
+            document.getElementById('masterCodeModal').classList.remove('hidden');
         }
 
-        function closeSecureResetModal() {
-            document.getElementById('secureResetModal').classList.add('hidden');
+        function closeMasterCodeModal() {
+            document.getElementById('masterCodeModal').classList.add('hidden');
         }
 
-        function handleSecureResetSubmit(e) {
+        function handleMasterResetSubmit(e) {
             e.preventDefault();
-            const enteredToken = document.getElementById('resetTokenInput').value.trim();
-            const newPass = document.getElementById('secureNewPass').value.trim();
+            const enteredMasterCode = document.getElementById('masterCodeInput').value.trim();
+            const newPass = document.getElementById('masterNewPass').value.trim();
+            const confirmPass = document.getElementById('masterConfirmPass').value.trim();
 
-            if (enteredToken !== masterResetToken) {
-                showToast("Invalid Master Reset Token!", "error");
+            if (enteredMasterCode !== SECRET_MASTER_CODE) {
+                showToast("Incorrect Master Code!", "error");
                 return;
             }
 
             if (!newPass) {
-                showToast("Password cannot be empty!", "error");
+                showToast("New password cannot be empty!", "error");
                 return;
             }
 
+            if (newPass !== confirmPass) {
+                showToast("Passwords do not match!", "error");
+                return;
+            }
+
+            // Update Password in Local State & Firebase Cloud (Invalidating previous password)
             siteSettings.adminPassword = newPass;
             db.collection("config").doc("settings").set(siteSettings)
               .then(() => {
-                  closeSecureResetModal();
-                  showToast("Password reset & synced to cloud!");
+                  closeMasterCodeModal();
+                  showToast("Password Reset Successful! Previous password is invalid.");
                   requestAdminAccess();
               });
         }
